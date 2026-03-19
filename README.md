@@ -23,6 +23,8 @@ Consulta la guida completa: `docs/MOBILE_APP_PREPARAZIONE.md`.
 Comandi rapidi:
 ```bash
 npm install
+npm run serve
+npm run build
 npm run sync
 npm run cap:android
 npm run cap:ios

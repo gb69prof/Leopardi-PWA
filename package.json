@@ -5,8 +5,8 @@
   "description": "PWA didattica su Leopardi con setup Capacitor per Android e iOS.",
   "scripts": {
     "serve": "python -m http.server 4173",
-    "copy": "npx cap copy",
-    "sync": "npx cap sync",
+    "build": "rm -rf dist && mkdir -p dist && rsync -a --delete --exclude '.git' --exclude 'node_modules' --exclude 'dist' --exclude 'android' --exclude 'ios' ./ dist/",
+    "sync": "npm run build && npx cap sync",
     "cap:android": "npx cap open android",
     "cap:ios": "npx cap open ios"
   },

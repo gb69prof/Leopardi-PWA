@@ -12,8 +12,8 @@
 - Aggiunti meta tag mobile/apple su tutte le pagine HTML del progetto.
 - Introdotta base Capacitor conservativa:
   - `package.json`
-  - `capacitor.config.json`
-  - script npm utili (`copy`, `sync`, `cap:android`, `cap:ios`).
+  - `capacitor.config.json` (con `webDir: dist`)
+  - script npm chiari (`serve`, `build`, `sync`, `cap:android`, `cap:ios`).
 
 ## Continuare a usare GitHub Pages come PWA
 
@@ -84,6 +84,8 @@ Non è necessario usare Capacitor per la versione web/PWA.
 
 ```bash
 npm install
+npm run serve
+npm run build
 npm run sync
 npm run cap:android
 npm run cap:ios

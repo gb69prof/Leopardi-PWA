@@ -1,6 +1,6 @@
 {
   "appId": "io.gbprof.leopardipwa",
   "appName": "Leopardi PWA",
-  "webDir": ".",
+  "webDir": "dist",
   "bundledWebRuntime": false
 }
