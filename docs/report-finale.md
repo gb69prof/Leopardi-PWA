@@ -1,70 +1,74 @@
-# Report finale: hardening PWA + base Capacitor
+# Report finale di verifica (2026-03-20)
 
-## Cosa è stato modificato
+## 1) Stato del progetto
 
-1. **Service Worker rifinito**
-   - separazione cache in:
-     - cache statica (`eco-leopardi-static-v3`)
-     - cache runtime pagine (`eco-leopardi-pages-v3`)
-   - strategia `cache-first` per asset statici (css/js/immagini/font)
-   - strategia `network-first` per navigazione HTML
-   - fallback offline essenziale su `index.html`
-   - riduzione lista hardcoded: precache solo core asset minimi
+**Pronto per merge: SI**
 
-2. **Base Capacitor resa concreta**
-   - aggiunto `capacitor.config.json` con:
-     - `appId`: `com.gb69prof.ecoleopardi`
-     - `appName`: `Eco di Leopardi`
-     - `webDir`: `.`
-   - configurazione coerente con sito statico in root, per preservare GitHub Pages
+La base PWA risulta coerente e funzionante sui controlli eseguibili in ambiente CLI. La parte Capacitor è configurata correttamente a livello file/config, con un unico vincolo operativo: in questo ambiente non è stato possibile installare pacchetti npm per policy di rete (HTTP 403), quindi `npx cap sync` non è stato eseguito fino in fondo.
 
-3. **Workflow npm chiarito**
-   - aggiunto `package.json` con script:
-     - `start` (server locale)
-     - `build` (check minimale)
-     - `check:pwa`
-     - `cap:sync`
-     - `cap:android`
-     - `cap:ios`
+---
 
-4. **Verifica minima obbligatoria**
-   - aggiunto `scripts/check-pwa.mjs` che controlla:
-     - presenza file critici
-     - validità base `manifest.json`
-     - esistenza icone dichiarate nel manifest
-
-## Problemi risolti
-- caching non più monolitico
-- minore rischio rotture con nuove pagine/asset
-- assenza completa di struttura Capacitor di base
-- assenza di check automatico minimo
-
-## Problemi ancora aperti / manuali
-- per usare davvero `npx cap sync` servono dipendenze installate (`npm install`).
-- per build mobile reale vanno aggiunte le piattaforme:
-  - `npx cap add android`
-  - `npx cap add ios` (solo su macOS con Xcode)
-- eventuale ottimizzazione dimensione immagini non è stata fatta (fuori scope).
-
-## Come testare
+## 2) Verifiche effettuate
 
 ### PWA
-1. `npm run check:pwa`
-2. `npm run start`
-3. aprire `http://localhost:8080`
-4. verificare in DevTools:
-   - Service Worker attivo
-   - cache `eco-leopardi-static-v3` e `eco-leopardi-pages-v3`
-   - offline fallback su navigazione
+- tutte le pagine HTML presenti rispondono correttamente via server locale (HTTP 200 sui principali entrypoint controllati)
+- `manifest.json` valido e coerente (campi essenziali presenti)
+- icone dichiarate nel manifest esistono e hanno dimensioni coerenti (`192x192`, `512x512`, `180x180`)
+- registrazione Service Worker presente nel codice client (`script.js`)
+- nessun riferimento locale rotto (`href/src`) nei file HTML
 
-### Capacitor Android
-1. `npm install`
-2. `npm run cap:sync`
-3. `npx cap add android` (solo la prima volta)
-4. `npm run cap:android`
+### Service Worker
+- strategie presenti e corrette:
+  - `network-first` per navigazione/pagine
+  - `cache-first` per asset statici
+- presente fallback offline minimo su `index.html`
+- non dipende da lista manuale di pagine HTML: le navigazioni vengono gestite runtime, quindi nuove pagine non rompono il SW
 
-### Capacitor iOS
-1. `npm install`
-2. `npm run cap:sync`
-3. `npx cap add ios` (solo la prima volta, su macOS)
-4. `npm run cap:ios`
+### Capacitor
+- `capacitor.config.json` coerente:
+  - `appId`: `com.gb69prof.ecoleopardi`
+  - `appName`: `Eco di Leopardi`
+  - `webDir`: `.`
+- struttura di base pronta per `cap sync` dopo install dipendenze
+- nessun path errato rilevato
+- cartelle `android/` e `ios/` non presenti (normale prima di `cap add`)
+
+### package.json
+- script coerenti con il flusso previsto (`start`, `check:pwa`, `build`, `cap:*`)
+- dipendenze essenziali e non ridondanti per bootstrap Capacitor/PWA
+- flusso operativo chiaro (prima `npm install`, poi script)
+
+---
+
+## 3) Simulazioni richieste
+
+### Apertura PWA su browser
+- eseguita con server locale (`python3 -m http.server 8080`) e verifica risorse/pagine via `curl`
+- esito: OK
+
+### Installazione PWA
+- verifica indiretta completata (manifest + icone + SW + pagina avvio)
+- test di prompt installazione resta **manuale browser** (dipende da browser/profilo/dispositivo)
+
+### Esecuzione `npx cap sync`
+- tentata, ma bloccata da errore rete/policy npm (`403 Forbidden`)
+- non è emerso un errore di configurazione progetto
+
+### Preparazione apertura Android
+- prerequisito noto: prima eseguire `npm install`, poi `npx cap add android` (una sola volta), quindi `npm run cap:android`
+- scenario non completabile qui per blocco installazione pacchetti
+
+---
+
+## 4) Problemi reali residui
+
+Nessun problema bloccante nel codice PWA rilevato.
+
+Vincolo residuo operativo (ambiente):
+- impossibile installare dipendenze npm da registry in questa sessione (`403`), quindi test Capacitor end-to-end non concluso localmente.
+
+---
+
+## 5) File modificati
+
+- `docs/report-finale.md`
